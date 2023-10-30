@@ -1,0 +1,92 @@
+Команды в py shell:
+
+from news.models import *
+
+1. Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+
+        User.objects.create_user('Konstantin')
+        User.objects.create_user('Nikolay')
+
+
+2. Создать два объекта модели Author, связанные с пользователями.
+        u1 = User.objects.get(username='Konstantin')
+        Author.objects.create(authorUser=u1)
+        u2 = User.objects.get(username='Nikolay')
+        Author.objects.create(authorUser=u2)
+
+3. Добавить 4 категории в модель Category.
+
+        Category.objects.create(name='Politic')
+        Category.objects.create(name='Sport')
+        Category.objects.create(name='Society')
+        Category.objects.create(name='Economic')
+
+4. Добавить 2 статьи и 1 новость.
+
+        author = Author.objects.get(id=1)
+        Post.objects.create(author=author, categoryType='NW', title='МИД: украинский БПЛА, атаковавший Курскую АЭС, врезался в склад ядерных отходов')
+        author =Author.objects.get(id=2)
+        Post.objects.create(author=author, categoryType='AR', title='Как я перешел с iPhone на Samsung Galaxy и почувствовал облегчение')
+        Post.objects.create(author=author, categoryType='AR', title='Нет, это не замок китайского императора — здесь живёт Григорий Лепс')
+
+5. Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+
+        Post.objects.get(id=1).postCategory.add(Category.objects.get(id=1))
+        Post.objects.get(id=2).postCategory.add(Category.objects.get(id=4))
+        Post.objects.get(id=3).postCategory.add(Category.objects.get(id=3))
+        Post.objects.get(id=1).postCategory.add(Category.objects.get(id=4))
+
+6. Создать как минимум 4 комментария к разным объектам модели Post
+    (в каждом объекте должен быть как минимум один комментарий).
+
+        Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=Author.objects.get(id=1).authorUser, text='Где красные линии? Уничтожить один город на западе Львов или ивано франков. Сколько можно бомбить Россию?')
+        Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=Author.objects.get(id=1).authorUser, text='Это что же получается - атомная станция беззащитна перед украинскими дронами? Не пора ли на виновных заводить уголовные дела по аналогии с полковником,оставившим без защиты Крымский мост? И ещё вопрос - этот бардак когда-нибудь прекратится?')
+        Comment.objects.create(commentPost=Post.objects.get(id=2), commentUser=Author.objects.get(id=2).authorUser, text='А когда перейдешь с самсунга на недорогие китайские телефоны, то вообще закайфуешь.')
+        Comment.objects.create(commentPost=Post.objects.get(id=3), commentUser=Author.objects.get(id=2).authorUser, text='Вы покажите лучше как живет учитель или шахтер, зачем нам их дворцы')
+
+7. Применяя функции like() и dislike() к статьям/новостям и комментариям,
+    скорректировать рейтинги этих объектов.
+
+        Post.objects.get(id=1).dislike()
+        Post.objects.get(id=2).like()
+        Post.objects.get(id=3).dislike()
+
+        Comment.objects.get(id=1).dislike()
+        Comment.objects.get(id=2).like()
+        Comment.objects.get(id=3).like()
+        Comment.objects.get(id=3).dislike()
+
+8. Обновить рейтинги пользователей.
+
+        a = Author.objects.get(id=1)
+        a.update_rating()
+        a.ratingAuthor
+
+        a = Author.objects.get(id=2)
+        a.update_rating()
+        a.ratingAuthor
+
+
+9. Вывести username и рейтинг лучшего пользователя
+    (применяя сортировку и возвращая поля первого объекта).
+
+        a = Author.objects.order_by('-ratingAuthor')[:1]
+            for i in a:
+                i.ratingAuthor
+                i.authorUser.username #-> 'Nikolay'
+
+10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи,
+    основываясь на лайках/дислайках к этой статье.
+
+        pp = Post.objects.order_by('-rating').first()
+             pp.dateCreation
+             pp.author.authorUser.username
+             pp.rating
+             pp.title
+             pp.preview()
+
+11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+        com = Comment.objects.filter(commentPost=pp)
+        com.values('dateCreation', 'commentUser', 'rating', 'text')
+
