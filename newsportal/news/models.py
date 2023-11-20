@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+import datetime
 
 
 class Author(models.Model):
@@ -50,6 +51,9 @@ class Post(models.Model):
 
     def preview(self):
         return self.text[0:123] + '...'
+
+    def __str__(self):
+        return f'{self.dateCreation.strftime("%d.%m.%Y %H:%M:%S"), self.title, self.text}'
 
 
 class PostCategory(models.Model):
