@@ -2,7 +2,7 @@ from django import template
 
 register = template.Library()
 
-words = ["Лепс", "АЭС,", "iPhone"]
+words = ["случаи", "АЭС,", "ВДНХ"]
 
 
 @register.filter()

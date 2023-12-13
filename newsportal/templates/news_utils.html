@@ -1,32 +1,37 @@
 {% extends 'flatpages/default.html' %}
 
-{% load custom_filters %}
 {% load custom_tags %}
 
 {% block title %}
-News
+Utils
 {% endblock title %}
 
 {% block content %}
-    <h1>ВСЕ НОВОСТИ</h1>
-    <h5>Количество: {{ news|length }}</h5>
+    <h1>РЕДАКТИРОВАНИЕ ЗАПИСЕЙ</h1>
+{#    <h5>Количество: {{ news|length }}</h5>#}
 
        <hr>
-    {% if news %}
+
+
+    {% if post_list %}
         <table>
            <tr>
-               <td><h6> Дата </h6></td>
-               <td><h6> Заголовок </h6></td>
-               <td><h6> Текст </h6></td>
-               <td><h6> Ссылка </h6></td>
+               <th scope="col">id</th>
+               <th scope="col">Дата</th>
+               <th scope="col">Заголовок</th>
+               <th scope="col">Текст</th>
+               <th scope="col">Редактирование</th>
+               <th scope="col">Удаление</th>
            </tr>
 
-          {% for n in news %}
+          {% for n in post_list %}
            <tr>
+               <td>{{ n.id }}</td>
                <td>{{ n.dateCreation|date:'d.m.Y' }}</td>
-               <td>{{ n.title|censor }}</td>
-               <td>{{ n.text|truncatechars:20|censor }}</td>
-               <td><a href="./{{ n.pk }}">Открыть</a></td>
+               <td>{{ n.title}}</td>
+               <td>{{ n.text|truncatechars:30 }}</td>
+               <td><a href="{% url 'edit_page' n.pk %}">Редактировать</a></td>
+               <td><a href="{% url 'delete_page' n.pk %}">Удалить</a></td>
            </tr>
            {% endfor %}
         </table>
