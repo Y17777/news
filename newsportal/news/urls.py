@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import (NewsList, NewsDetail, create_post, Search, news_util, edit_page, delete_page)
+from .views import (NewsList, NewsDetail, PostCreate, Search, NewsUtil, PostEdit, PostDelete)
 
 
 urlpatterns = [
-     path('', NewsList.as_view()),
-     path('<int:pk>', NewsDetail.as_view()),
-     path('create/', create_post, name='post_create'),
-     path('search/', Search.as_view()),
-     path('utils/', news_util, name='news_util'),
-     path('edit/<int:pk>', edit_page, name='edit_page'),
-     path('delete/<int:pk>', delete_page, name='delete_page'),
+     path('', NewsList.as_view(), name='news'),
+     path('<int:pk>', NewsDetail.as_view(), name='news_detail'),
+     path('create/', PostCreate.as_view(), name='create_page'),
+     path('search/', Search.as_view(), name='search_page'),
+     path('utils/', NewsUtil.as_view(), name='news_util'),
+     path('edit/<int:pk>', PostEdit.as_view(), name='edit_page'),
+     path('delete/<int:pk>', PostDelete.as_view(), name='delete_page'),
 ]
