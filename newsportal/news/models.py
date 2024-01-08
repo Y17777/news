@@ -25,6 +25,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    subscribers = models.ManyToManyField(User, related_name='categories')
 
     def __str__(self):
         return self.name
@@ -57,8 +58,8 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.dateCreation.strftime("%d.%m.%Y %H:%M:%S"), self.title, self.text}'
 
-    # def get_absolute_url(self):
-    #     return reverse('news_det', args=[str(self.id)])
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
 
 
 class PostCategory(models.Model):

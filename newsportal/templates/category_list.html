@@ -8,31 +8,34 @@ News
 {% endblock title %}
 
 {% block content %}
-    <h1>ВСЕ НОВОСТИ</h1>
-    <h5>Количество: {{ news|length }}</h5>
-
+    <h1>ПОДПИСКИ</h1>
+        {% if is_not_subscriber %}
+            <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться</a></p>
+{#            {% else %}#}
+{#            <p class="text-center"><a href="{% url 'subscribe' category.id %}" action = "unsubscribe" class="btn btn-secondary btn-sm">Отписаться</a></p>#}
+        {% endif %}
        <hr>
-    {% if news %}
+    {% if category_news_list %}
         <table>
            <tr>
                <td><h6> Дата </h6></td>
                <td><h6> Заголовок </h6></td>
                <td><h6> Категория </h6></td>
                <td><h6> Текст </h6></td>
-               <td><h6> Ссылка </h6></td>
+{#               <td><h6> Ссылка </h6></td>#}
            </tr>
 
-          {% for n in news %}
+          {% for n in category_news_list %}
            <tr>
                <td>{{ n.dateCreation|date:'d.m.Y' }}</td>
                <td>{{ n.title|censor }}</td>
                <td>
-                   {% for category in n.postCategory.all %}
-                       <a href="{% url 'category_list' category.id %}">{{ category }}</a>
+                   {% for cat in n.postCategory.all %}
+                       <a href="{% url 'category_list' cat.id %}">{{ cat }}</a>
                    {% endfor %}
                </td>
                <td>{{ n.text|truncatechars:20|censor }}</td>
-               <td><a href="./{{ n.pk }}">Открыть</a></td>
+{#               <td><a href="./{{ n.pk }}">Открыть</a></td>#}
            </tr>
            {% endfor %}
         </table>

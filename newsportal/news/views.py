@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
 from .forms import PostForm
-from .models import Post
+from .models import Post, Category
 from .filters import PostFilter
 
 
@@ -59,33 +61,10 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy('news')
 
 
-# def create_post(request):
-#     if request.method == 'POST':
-#         form = PostForm(request.POST)
-#         form.save()
-#         return HttpResponseRedirect('/news')
-#     form = PostForm
-#     return render(request, 'create_page.html', {'form': form})
-
-
 class NewsUtil(ListView):
     form_class = PostForm
     model = Post
     template_name = 'news_utils.html'
-    # success_url = reverse_lazy('news')
-# def news_util(request):
-#     if request.method == 'POST':
-#         form = PostForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#     template = 'news_utils.html'
-#     cnt = {
-#         'post_list': Post.objects.all().order_by('dateCreation'),
-#         'form': PostForm()
-#     }
-
-    # form = PostForm
-    # return render(request, template, cnt)
 
 
 class PostEdit(PermissionRequiredMixin, UpdateView):
@@ -95,31 +74,45 @@ class PostEdit(PermissionRequiredMixin, UpdateView):
     template_name = 'edit_page.html'
     success_url = reverse_lazy('news')
 
-# def edit_page(request, pk):
-#     get_post = Post.objects.get(pk=pk)
-#     if request.method == 'POST':
-#         form = PostForm(request.POST, instance=get_post)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponseRedirect('/news')
-#     template = 'edit_page.html'
-#
-#     cnt = {
-#         'get_post': get_post,
-#         'form': PostForm(instance=get_post)
-#     }
-#     return render(request, template, cnt)
-
 
 class PostDelete(PermissionRequiredMixin, DeleteView):
     permission_required = ('news.delete_post',)
-    form_class = PostForm
+    # form_class = PostForm
     model = Post
-    template_name = 'news_det.html'
+    template_name = 'news_delete.html'
     success_url = reverse_lazy('news')
 
 
-# def delete_page(request, pk):
-#     get_post = Post.objects.get(pk=pk)
-#     get_post.delete()
-#     return HttpResponseRedirect('/news/utils')
+class CategoryListView(ListView):
+    model = Post
+    template_name = 'category_list.html'
+    context_object_name = 'category_news_list'
+
+    def get_queryset(self):
+        self.postCategory = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = Post.objects.filter(postCategory=self.postCategory).order_by('-dateCreation')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.postCategory.subscribers.all()
+        context['category'] = self.postCategory
+        return context
+
+
+@login_required
+def subscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    # action = request.POST.get('action')
+    # if action == 'subscribe':
+    category.subscribers.add(user)
+
+    message = 'Вы успешно подписались на рассылку новостей категории '
+
+    # elif action == 'unsubscribe':
+    #     category.subscribers.remove(user)
+
+        # message = 'Вы успешно отписались от рассылки новостей категории '
+
+    return render(request, 'subscribe.html', {'category': category, 'message': message})
