@@ -104,15 +104,19 @@ class CategoryListView(ListView):
 def subscribe(request, pk):
     user = request.user
     category = Category.objects.get(id=pk)
-    # action = request.POST.get('action')
-    # if action == 'subscribe':
     category.subscribers.add(user)
 
     message = 'Вы успешно подписались на рассылку новостей категории '
 
-    # elif action == 'unsubscribe':
-    #     category.subscribers.remove(user)
+    return render(request, 'subscribe.html', {'category': category, 'message': message})
 
-        # message = 'Вы успешно отписались от рассылки новостей категории '
+
+@login_required
+def unsubscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.remove(user)
+
+    message = 'Вы успешно отписались от рассылки новостей категории '
 
     return render(request, 'subscribe.html', {'category': category, 'message': message})
