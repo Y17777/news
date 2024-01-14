@@ -1,9 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 
+# from news.tasks import hello
 from .forms import PostForm
 from .models import Post, Category
 from .filters import PostFilter
@@ -120,3 +123,9 @@ def unsubscribe(request, pk):
     message = 'Вы успешно отписались от рассылки новостей категории '
 
     return render(request, 'subscribe.html', {'category': category, 'message': message})
+
+
+# class IndexView(View):
+#     def get(self, request):
+#         hello.delay()
+#         return HttpResponse('Hello!')
