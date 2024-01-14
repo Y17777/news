@@ -50,7 +50,7 @@ def weekly_send_email_task():
         }
     )
     msg = EmailMultiAlternatives(
-        subject='Статьи за неделю',
+        subject='Новое за неделю',
         body='',
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=subscribers,
