@@ -1,5 +1,9 @@
 import os
 from pathlib import Path
+import logging
+
+from django.conf.global_settings import LOGGING
+
 # from dotenv import load_dotenv
 
 # load_dotenv()
@@ -121,7 +125,7 @@ USE_TZ = False
 STATIC_URL = 'static/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -169,3 +173,107 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),
+        'TIMEOUT': 30
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'f_info', 'f_warning', 'f_error'],
+            'level': 'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['f_error', 'f_error_to_mail'],
+        },
+        'django.server': {
+            'handlers': ['f_error', 'f_error_to_mail'],
+        },
+        'django.template': {
+            'handlers': ['f_error'],
+        },
+        'django.db.backends': {
+            'handlers': ['f_error'],
+        },
+        'django.security': {
+            'handlers': ['f_secur'],
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'c_formatter',
+            'filters': ['require_debug_true'],
+        },
+        'f_info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'fi_formatter',
+            'filters': ['require_debug_false'],
+        },
+        'f_warning': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'fw_formatter',
+        },
+        'f_error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'fe_formatter',
+            'filters': ['require_debug_false'],
+        },
+        'f_error_to_mail': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'fw_formatter',
+            'filters': ['require_debug_false'],
+        },
+        'f_secur': {
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'fi_formatter',
+        },
+    },
+
+    'formatters': {
+        'c_formatter': {
+            'format': '{levelname} {message} {asctime}',
+            'datetime': '%m.%d %H:%M%S',
+            'style': '{',
+        },
+        'fi_formatter': {
+            'format': '{levelname} {message} {asctime} {module}',
+            'datetime': '%m.%d %H:%M%S',
+            'style': '{',
+        },
+        'fe_formatter': {
+            'format': '{levelname} {message} {asctime} {pathname} {exc_info}',
+            'datetime': '%m.%d %H:%M%S',
+            'style': '{',
+        },
+        'fw_formatter': {
+            'format': '{levelname} {message} {asctime} {pathname}',
+            'datetime': '%m.%d %H:%M%S',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    }
+}

@@ -5,11 +5,14 @@ from django.shortcuts import get_object_or_404, render
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.core.cache import cache
 
-# from news.tasks import hello
 from .forms import PostForm
 from .models import Post, Category
 from .filters import PostFilter
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NewsList(ListView):
@@ -53,6 +56,17 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'news_det.html'
     context_object_name = 'news_det'
+    queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'news-{self.kwargs["pk"]}',
+                        None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'news-{self.kwargs["pk"]}', obj)
+            return obj
 
 
 class PostCreate(PermissionRequiredMixin, CreateView):

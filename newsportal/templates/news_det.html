@@ -1,11 +1,13 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}!
+{% load cache %}
 
 {% block title %}
 news_det
 {% endblock title %}
 
+{% cache 300 content %}
 {% block content %}
     <h4>{{ news_det.title|censor }}</h4>
     <hr>
@@ -13,3 +15,4 @@ news_det
     {{ news_det.dateCreation|date:'d.m.Y'}}
 
 {% endblock content %}
+{% endcache %}

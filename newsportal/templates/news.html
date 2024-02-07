@@ -2,11 +2,12 @@
 
 {% load custom_filters %}
 {% load custom_tags %}
+{% load cache %}
 
 {% block title %}
 News
 {% endblock title %}
-
+{% cache 60 content %}
 {% block content %}
     <h1>ВСЕ НОВОСТИ</h1>
     <h5>Количество: {{ news|length }}</h5>
@@ -59,3 +60,4 @@ News
        {% endif %}
    {% endif %}
 {% endblock content %}
+{% endcache %}
